@@ -1,7 +1,6 @@
-package me.gimme.gimmeores.chunk;
+package me.gimme.gimmeores.generation;
 
-import me.gimme.gimmeores.generation.Populator;
-import me.gimme.gimmeores.generation.PopulatorFactory;
+import me.gimme.gimmeores.chunk.PopulatedChunksData;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;

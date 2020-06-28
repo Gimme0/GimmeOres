@@ -3,6 +3,7 @@ package me.gimme.gimmeores.chunk;
 import me.gimme.gimmecore.util.SaveFile;
 import me.gimme.gimmeores.GimmeOres;
 import me.gimme.gimmeores.generation.Populator;
+import me.gimme.gimmeores.generation.PopulatorSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
