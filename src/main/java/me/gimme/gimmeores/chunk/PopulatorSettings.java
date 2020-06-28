@@ -48,9 +48,7 @@ public class PopulatorSettings {
     @Nullable
     public Populator createPopulator() {
         List<Material> materials;
-        Material material;
         if (isAssignableFrom(List.class, CONFIG_MATERIAL)) {
-            material = null;
             List<String> materialStrings = getNullable(CONFIG_MATERIAL, null);
             materials = materialStrings != null
                     ? materialStrings.stream()
@@ -59,8 +57,8 @@ public class PopulatorSettings {
                     .collect(Collectors.toList())
                     : null;
         } else {
-            material = Material.matchMaterial(get(CONFIG_MATERIAL, ""));
-            materials = null;
+            Material material = Material.matchMaterial(get(CONFIG_MATERIAL, ""));
+            materials = material != null ? new ArrayList<>(Collections.singletonList(material)) : null;
         }
         String type = get(CONFIG_TYPE, "VEIN");
         int size = get(CONFIG_SIZE, 1);
@@ -108,7 +106,7 @@ public class PopulatorSettings {
         }
 
         return PopulatorFactory.createPopulator(plugin, populatedChunksData,
-                populatorType, material, materials, size, tries, minHeight, maxHeight, replaceWith, replaceRestWith,
+                populatorType, materials, size, tries, minHeight, maxHeight, replaceWith, replaceRestWith,
                 canReplace, worlds, biomes
         );
     }

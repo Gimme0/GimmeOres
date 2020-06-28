@@ -20,8 +20,7 @@ public class VeinPopulator extends Populator {
     /**
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
-     * @param type                the material of the blocks to generate, or null for all (only for removing)
-     * @param types               the materials of the blocks to generate, or null
+     * @param types               the materials of the blocks to generate, or null for all (only for replacing)
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -32,11 +31,11 @@ public class VeinPopulator extends Populator {
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
      */
-    public VeinPopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
+    public VeinPopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData,
                      @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
                      @Nullable Material replaceWith, @Nullable Material replaceRestWith, @Nullable Set<Material> canReplace,
                      @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
-        super(plugin, populatedChunksData, type, types, size, triesPerChunk, minHeight, maxHeight, replaceWith,
+        super(plugin, populatedChunksData, types, size, triesPerChunk, minHeight, maxHeight, replaceWith,
                 replaceRestWith, canReplace, worlds, biomes);
     }
 

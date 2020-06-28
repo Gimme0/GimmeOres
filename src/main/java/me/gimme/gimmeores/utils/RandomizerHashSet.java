@@ -1,6 +1,7 @@
 package me.gimme.gimmeores.utils;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -26,10 +27,12 @@ public class RandomizerHashSet<E> extends HashSet<E> {
     }
 
     /**
-     * @return a random element from the set in O(1) time
+     * @return a random element from the set in O(1) time, or null if the set is empty
      * @param random the random generator to use
      */
+    @Nullable
     public E getRandomElement(@NotNull Random random) {
+        if (list.size() == 0) return null;
         int index = random.nextInt(list.size());
         return list.get(index);
     }

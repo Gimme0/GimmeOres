@@ -30,8 +30,6 @@ public abstract class Populator {
     private PopulatedChunksData populatedChunksData;
 
     @Nullable
-    private Material type;
-    @Nullable
     private RandomizerHashSet<Material> types;
     private int size;
     private int minHeight;
@@ -51,8 +49,7 @@ public abstract class Populator {
     /**
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
-     * @param type                the material of the blocks to generate, or null for all (only for removing)
-     * @param types               the materials of the blocks to generate, or null
+     * @param types               the materials of the blocks to generate, or null for all (only for replacing)
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -63,14 +60,13 @@ public abstract class Populator {
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
      */
-    public Populator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
+    public Populator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData,
                      @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
                      @Nullable Material replaceWith, @Nullable Material replaceRestWith, @Nullable Set<Material> canReplace,
                      @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         this.plugin = plugin;
         this.populatedChunksData = populatedChunksData;
 
-        this.type = type;
         this.types = types != null ? new RandomizerHashSet<>(types) : null;
         this.size = size;
         this.triesPerChunk = triesPerChunk;
@@ -79,7 +75,7 @@ public abstract class Populator {
         this.replaceWith = replaceWith;
         this.replaceRestWith = replaceRestWith;
         this.canReplace = canReplace;
-        if (this.canReplace != null) this.canReplace.add(type);
+        if (this.canReplace != null && types != null) this.canReplace.addAll(types);
         this.worlds = worlds;
         this.biomes = biomes;
     }
@@ -114,7 +110,7 @@ public abstract class Populator {
         }
 
         unpopulate(source, replaceWith, replaceRestWith);
-        if ((type == null && types == null) || size == 0 || triesPerChunk == 0) return;
+        if (types == null || types.size() == 0 || size == 0 || triesPerChunk == 0) return;
 
         int offset = 8;
 
@@ -202,7 +198,6 @@ public abstract class Populator {
     }
 
     private void replace(@NotNull Block block, @NotNull Material replaceWith) {
-        if (type != null && !type.equals(block.getType())) return;
         if (types != null && !types.contains(block.getType())) return;
 
         // If marked as having been populated by this plugin, don't remove it
@@ -216,23 +211,21 @@ public abstract class Populator {
     }
 
     private void replaceRest(@NotNull Block block, @NotNull Material replaceRestWith) {
-        if (type != null && type.equals(block.getType())) return;
         if (types != null && types.contains(block.getType())) return;
 
         if (block.getType() != replaceRestWith) block.setType(replaceRestWith, false);
     }
 
     /**
-     * TODO
-     *
-     * @param random
-     * @return
+     * @return a random material from this populator's set of types
+     * @param random the random generator to use
      */
     @NotNull
     private Material rollType(@NotNull Random random) {
-        if (type != null) return type;
-        if (types != null) return types.getRandomElement(random);
-        throw new IllegalStateException("Either type of types needs to be non null when calling this method");
+        if (types == null) throw new IllegalStateException("the types set cannot be null when reaching this point");
+        Material result = types.getRandomElement(random);
+        if (result == null) throw new IllegalStateException("the types set cannot be empty or contain null elements when reaching this point");
+        return result;
     }
 
     /**
