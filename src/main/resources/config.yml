@@ -24,9 +24,9 @@ debug: false
 #     - polished_andesite
 #     - polished_diorite
 #     - polished_granite
-#   worlds:                                     # the worlds to generate in
+#   worlds:                     # the worlds to generate in
 #     - world
-#   biomes: (all)                               # the biomes to generate in, or "all" for all
+#   biomes: (all)               # the biomes to generate in, or "all" for all (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html)
 #     - <BIOME>
 #
 populators:
