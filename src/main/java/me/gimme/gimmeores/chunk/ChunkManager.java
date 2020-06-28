@@ -25,21 +25,21 @@ public class ChunkManager implements Listener {
     private static final String CONFIG_DEFAULT_VALUES = "default";
     private static final String CONFIG_POPULATORS = "populators";
 
-    private static final String FILE_PATH = "loaded-chunks.json";
+    private static final String FILE_PATH = "populated-chunks.json";
 
     private Plugin plugin;
     private FileConfiguration config;
-    private SaveFile<LoadedChunksData> saveFile;
+    private SaveFile<PopulatedChunksData> saveFile;
     private Map<UUID, Random> randomGeneratorByWorld = new HashMap<>();
 
     private Map<UUID, Integer> chunkCountByWorld = new HashMap<>();
-    private LoadedChunksData loadedChunksData = new LoadedChunksData();
+    private PopulatedChunksData populatedChunksData = new PopulatedChunksData();
     private List<Populator> populators = new ArrayList<>();
 
     public ChunkManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
         this.config = plugin.getConfig();
-        this.saveFile = new SaveFile<>(plugin, FILE_PATH, LoadedChunksData.class);
+        this.saveFile = new SaveFile<>(plugin, FILE_PATH, PopulatedChunksData.class);
 
         registerPopulators();
     }
@@ -48,18 +48,26 @@ public class ChunkManager implements Listener {
      * Loads data from the save file and starts autosaving.
      */
     public void onEnable() {
-        LoadedChunksData data = saveFile.load();
-        if (data != null) this.loadedChunksData = data;
+        PopulatedChunksData data = saveFile.load();
+        if (data != null) this.populatedChunksData = data;
 
-        saveFile.autosave(plugin, 20 * 300, () -> loadedChunksData);
+        saveFile.autosave(plugin, 20 * 300, () -> populatedChunksData);
     }
 
     /**
      * Saves data to the save file.
      */
     public void onDisable() {
-        loadedChunksData.cleanupWorlds(plugin.getServer());
-        saveFile.save(loadedChunksData);
+        populatedChunksData.cleanupWorlds(plugin.getServer());
+        saveFile.save(populatedChunksData);
+    }
+
+    /**
+     * @return the number of generated chunks in the specified world
+     * @param world
+     */
+    public int getNumberOfGeneratedChunks(@NotNull World world) {
+        return populatedChunksData.getPopulatedChunks(world).size();
     }
 
     /**
@@ -73,7 +81,7 @@ public class ChunkManager implements Listener {
         ConfigurationSection ds = config.getConfigurationSection(CONFIG_DEFAULT_VALUES);
 
         for (Map<String, ?> ps : (List<Map<String, ?>>) populatorSettingsList) {
-            Populator populator = new PopulatorSettings(ps, ds, plugin, loadedChunksData).createPopulator();
+            Populator populator = new PopulatorSettings(ps, ds, plugin, populatedChunksData).createPopulator();
             if (populator != null) this.populators.add(populator);
         }
     }
@@ -109,11 +117,11 @@ public class ChunkManager implements Listener {
     private void onDecoratorChunkGeneration(@NotNull Chunk chunk) {
         World world = chunk.getWorld();
 
-        Set<Point> loadedChunks = loadedChunksData.getLoadedChunks(world);
+        Set<Point> populatedChunks = populatedChunksData.getPopulatedChunks(world);
 
         Point chunkPoint = new Point(chunk.getX(), chunk.getZ());
-        if (loadedChunks.contains(chunkPoint)) return;
-        loadedChunks.add(chunkPoint);
+        if (populatedChunks.contains(chunkPoint)) return;
+        populatedChunks.add(chunkPoint);
 
         Bukkit.getLogger().info(world.getName() + ": populating new chunk ("
                 + chunkCountByWorld.merge(world.getUID(), 1, Integer::sum) + ")"); // TODO: remove?
@@ -129,6 +137,6 @@ public class ChunkManager implements Listener {
      */
     @NotNull
     private Random getRandomGenerator(@NotNull World world) {
-        return randomGeneratorByWorld.computeIfAbsent(world.getUID(), k -> new Random(loadedChunksData.getSeed(world)));
+        return randomGeneratorByWorld.computeIfAbsent(world.getUID(), k -> new Random(populatedChunksData.getSeed(world)));
     }
 }

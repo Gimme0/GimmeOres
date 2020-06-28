@@ -30,14 +30,14 @@ public class PopulatorSettings {
     @Nullable
     private ConfigurationSection defaultSettings;
     private Plugin plugin;
-    private LoadedChunksData loadedChunksData;
+    private PopulatedChunksData populatedChunksData;
 
     public PopulatorSettings(@NotNull Map<String, ?> populatorSettings, @Nullable ConfigurationSection defaultSettings,
-                              @NotNull Plugin plugin, @NotNull LoadedChunksData loadedChunksData) {
+                              @NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData) {
         this.populatorSettings = populatorSettings;
         this.defaultSettings = defaultSettings;
         this.plugin = plugin;
-        this.loadedChunksData = loadedChunksData;
+        this.populatedChunksData = populatedChunksData;
     }
 
     /**
@@ -90,7 +90,7 @@ public class PopulatorSettings {
             }
         }
 
-        return PopulatorFactory.createPopulator(plugin, loadedChunksData,
+        return PopulatorFactory.createPopulator(plugin, populatedChunksData,
                 populatorType, material, size, tries, minHeight, maxHeight, replaceWith,
                 canReplace, worlds, biomes
         );

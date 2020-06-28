@@ -1,6 +1,6 @@
 package me.gimme.gimmeores.generation;
 
-import me.gimme.gimmeores.chunk.LoadedChunksData;
+import me.gimme.gimmeores.chunk.PopulatedChunksData;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,7 +26,7 @@ public abstract class Populator {
     @NotNull
     private Plugin plugin;
     @NotNull
-    private LoadedChunksData loadedChunksData;
+    private PopulatedChunksData populatedChunksData;
 
     @NotNull
     private Material type;
@@ -44,24 +44,24 @@ public abstract class Populator {
     private Set<Biome> biomes;
 
     /**
-     * @param plugin           the plugin
-     * @param loadedChunksData the data of loaded chunks
-     * @param type             the material of the blocks to generate
-     * @param size             the size of the generation
-     * @param triesPerChunk    number of generation attempts per chunk
-     * @param minHeight        the min height to generate at
-     * @param maxHeight        the max height to generate at
-     * @param replaceWith      type of block to replace previous instances of the specified material with, or null for not removing
-     * @param canReplace       the type of blocks that can be replaced in the generation, or null for all
-     * @param worlds           the worlds to generate in
-     * @param biomes           the biomes to generate in, or null for all biomes
+     * @param plugin              the plugin
+     * @param populatedChunksData the data of populated chunks
+     * @param type                the material of the blocks to generate
+     * @param size                the size of the generation
+     * @param triesPerChunk       number of generation attempts per chunk
+     * @param minHeight           the min height to generate at
+     * @param maxHeight           the max height to generate at
+     * @param replaceWith         type of block to replace previous instances of the specified material with, or null for not removing
+     * @param canReplace          the type of blocks that can be replaced in the generation, or null for all
+     * @param worlds              the worlds to generate in
+     * @param biomes              the biomes to generate in, or null for all biomes
      */
-    public Populator(@NotNull Plugin plugin, @NotNull LoadedChunksData loadedChunksData, @NotNull Material type,
+    public Populator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @NotNull Material type,
                      int size, double triesPerChunk, int minHeight, int maxHeight,
                      @Nullable Material replaceWith, @Nullable Set<Material> canReplace,
                      @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         this.plugin = plugin;
-        this.loadedChunksData = loadedChunksData;
+        this.populatedChunksData = populatedChunksData;
 
         this.type = type;
         this.size = size;
@@ -138,7 +138,7 @@ public abstract class Populator {
 
     /**
      * Sets the block at the specified position to the type of this populator.
-     *
+     * <p>
      * Only sets the block if xyz are within a 32*256*32 box (the four chunks made up of the source chunk and its
      * neighbors up to x + 1 and z + 1), and the current type at the position can be replaced.
      *
@@ -164,9 +164,9 @@ public abstract class Populator {
 
         // If the block is in a chunk that hasn't been populated yet, mark it so that it doesn't get removed by
         // unpopulation later.
-        Set<Point> loadedChunks = loadedChunksData.getLoadedChunks(world);
-        if (!isInChunk(x, z, sourceChunk) && !loadedChunks.contains(new Point(x >> 4, z >> 4))) {
-            block.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, loadedChunksData.getId(world)));
+        Set<Point> populatedChunks = populatedChunksData.getPopulatedChunks(world);
+        if (!isInChunk(x, z, sourceChunk) && !populatedChunks.contains(new Point(x >> 4, z >> 4))) {
+            block.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, populatedChunksData.getId(world)));
         }
     }
 
@@ -186,7 +186,7 @@ public abstract class Populator {
 
                     // If marked as having been populated by this plugin, don't remove it
                     List<MetadataValue> metadataValues = block.getMetadata(METADATA_KEY);
-                    if (!metadataValues.isEmpty() && metadataValues.get(0).asString().equals(loadedChunksData.getId(chunk.getWorld()))) {
+                    if (!metadataValues.isEmpty() && metadataValues.get(0).asString().equals(populatedChunksData.getId(chunk.getWorld()))) {
                         block.removeMetadata(METADATA_KEY, plugin);
                         continue;
                     }
