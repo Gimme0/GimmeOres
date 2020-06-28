@@ -1,6 +1,7 @@
 package me.gimme.gimmeores.chunk;
 
 import me.gimme.gimmecore.util.SaveFile;
+import me.gimme.gimmeores.GimmeOres;
 import me.gimme.gimmeores.generation.Populator;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -115,11 +116,13 @@ public class ChunkManager implements Listener {
         if (populatedChunks.contains(chunkPoint)) return;
         populatedChunks.add(chunkPoint);
 
-        Bukkit.getLogger().info(world.getName() + ": populating new chunk ("
-                + chunkCountByWorld.merge(world.getUID(), 1, Integer::sum) + ")"); // TODO: remove?
-
         for (Populator populator : populators) {
             populator.populate(chunk, getRandomGenerator(world));
+        }
+
+        if (config.getBoolean(GimmeOres.CONFIG_DEBUG)) {
+            Bukkit.getLogger().info(world.getName() + ": populated new chunk ("
+                    + chunkCountByWorld.merge(world.getUID(), 1, Integer::sum) + ")");
         }
     }
 

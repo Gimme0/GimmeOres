@@ -1,3 +1,6 @@
+# If informative messages should be printed in the console (will clutter the log)
+debug: false
+
 # A populator is responsible for generating a small area of blocks, for example, ores in the ground.
 #
 # Vanilla values for ore generation can be found on the wiki: https://minecraft.gamepedia.com/Mineral_vein.

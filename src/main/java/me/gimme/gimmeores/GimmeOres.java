@@ -14,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Arrays;
 
 public final class GimmeOres extends JavaPlugin implements CommandExecutor {
+    public static final String CONFIG_DEBUG = "debug";
+
     public static final String PERMISSIONS_PATH = "gimmeores";
     public static final String ORES_COMMAND = "ores";
 
