@@ -1,0 +1,2 @@
+# GimmeOres
+Ore distribution

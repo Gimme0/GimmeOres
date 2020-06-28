@@ -1,0 +1,94 @@
+# A populator is responsible for generating a small area of blocks, for example, ores in the ground.
+#
+# Vanilla values for ore generation can be found on the wiki: https://minecraft.gamepedia.com/Mineral_vein.
+# Most of the time, the values found there will produce the same results if plugged in here. But some might differ
+# slightly (e.g. "tries" for emerald).
+#
+# POPULATOR FORMAT:
+# - material: <block>                           # the material of the blocks to generate
+#   type: [VEIN|SINGLE] (VEIN)                  # the populator type: VEIN for clusters, SINGLE for solo blocks
+#   size: <vein size> (1)                       # the size of the veins to generate (not exact)
+#   tries: <generation tries per chunk> (0.0)   # number of generation attempts per chunk
+#   min-height: <min generation height> (0)     # the min height to generate at
+#   max-height: <max generation height> (255)   # the max height to generate at
+#   replace-with: <block> (none)                # type of block to replace previous instances of the specified material with, or null for not removing
+#   can-replace:                                # the type of blocks that can be replaced in the generation, or null for all
+#     - stone
+#     - andesite
+#     - diorite
+#     - granite
+#     - polished_andesite
+#     - polished_diorite
+#     - polished_granite
+#   worlds:                                     # the worlds to generate in
+#     - world
+#   biomes: (all)                               # the biomes to generate in, or null for all
+#     - <BIOME>
+#
+populators:
+  - material: gold_ore
+    max-height: 31
+    replace-with: stone
+  - material: gold_ore
+    size: 9
+    tries: 20
+    min-height: 32
+    max-height: 79
+    replace-with: stone
+    biomes:
+      - BADLANDS
+      - BADLANDS_PLATEAU
+      - ERODED_BADLANDS
+      - MODIFIED_BADLANDS_PLATEAU
+      - MODIFIED_WOODED_BADLANDS_PLATEAU
+      - WOODED_BADLANDS_PLATEAU
+  - material: gold_ore
+    size: 9
+    tries: 2
+    max-height: 31
+
+  - material: emerald_ore
+    type: SINGLE
+    tries: 4
+    min-height: 4
+    max-height: 31
+    replace-with: stone
+    biomes:
+      - GRAVELLY_MOUNTAINS
+      - MODIFIED_GRAVELLY_MOUNTAINS
+      - MOUNTAINS
+      - MOUNTAIN_EDGE
+      - WOODED_MOUNTAINS
+
+  - material: diamond_ore
+    size: 8
+    tries: 1
+    max-height: 15
+    replace-with: stone
+
+
+
+
+
+# -------------------- DEFAULT VALUES --------------------
+
+# Default values used when absent from a populator above
+default:
+  type: VEIN
+  size: 1
+  tries: 0.0
+  min-height: 0
+  max-height: 255
+  replace-with: null # No replace
+  can-replace:
+    - stone
+    - andesite
+    - diorite
+    - granite
+    - polished_andesite
+    - polished_diorite
+    - polished_granite
+  worlds:
+    - world
+  biomes: null # All
+
