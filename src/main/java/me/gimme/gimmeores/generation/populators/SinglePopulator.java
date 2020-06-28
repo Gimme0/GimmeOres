@@ -28,15 +28,17 @@ public class SinglePopulator extends Populator {
      * @param minHeight           the min height to generate at
      * @param maxHeight           the max height to generate at
      * @param replaceWith         type of block to replace previous instances of the specified material with, or null for not removing
+     * @param replaceRestWith     type of block to replace all other blocks with, or null for not removing
      * @param canReplace          the type of blocks that can be replaced in the generation, or null for all
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
      */
     public SinglePopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
-                           @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
-                           @Nullable Material replaceWith, @Nullable Set<Material> canReplace,
-                           @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
-        super(plugin, populatedChunksData, type, types, size, triesPerChunk, minHeight, maxHeight, replaceWith, canReplace, worlds, biomes);
+                     @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
+                     @Nullable Material replaceWith, @Nullable Material replaceRestWith, @Nullable Set<Material> canReplace,
+                     @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
+        super(plugin, populatedChunksData, type, types, size, triesPerChunk, minHeight, maxHeight, replaceWith,
+                replaceRestWith, canReplace, worlds, biomes);
     }
 
     @Override

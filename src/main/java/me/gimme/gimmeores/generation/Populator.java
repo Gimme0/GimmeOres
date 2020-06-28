@@ -40,6 +40,8 @@ public abstract class Populator {
     @Nullable
     private Material replaceWith;
     @Nullable
+    private Material replaceRestWith;
+    @Nullable
     private Set<Material> canReplace;
     @NotNull
     private Set<String> worlds;
@@ -56,13 +58,14 @@ public abstract class Populator {
      * @param minHeight           the min height to generate at
      * @param maxHeight           the max height to generate at
      * @param replaceWith         type of block to replace previous instances of the specified material with, or null for not removing
+     * @param replaceRestWith     type of block to replace all other blocks with, or null for not removing
      * @param canReplace          the type of blocks that can be replaced in the generation, or null for all
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
      */
     public Populator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
                      @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
-                     @Nullable Material replaceWith, @Nullable Set<Material> canReplace,
+                     @Nullable Material replaceWith, @Nullable Material replaceRestWith, @Nullable Set<Material> canReplace,
                      @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         this.plugin = plugin;
         this.populatedChunksData = populatedChunksData;
@@ -74,6 +77,7 @@ public abstract class Populator {
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
         this.replaceWith = replaceWith;
+        this.replaceRestWith = replaceRestWith;
         this.canReplace = canReplace;
         if (this.canReplace != null) this.canReplace.add(type);
         this.worlds = worlds;
@@ -109,7 +113,7 @@ public abstract class Populator {
             if (correctBiomeCount == 0) return;
         }
 
-        if (replaceWith != null) unpopulate(source, replaceWith);
+        unpopulate(source, replaceWith, replaceRestWith);
         if ((type == null && types == null) || size == 0 || triesPerChunk == 0) return;
 
         int offset = 8;
@@ -179,30 +183,51 @@ public abstract class Populator {
      * Removes previous instances of blocks with the type of this populator in the specified chunk.
      * Only removes blocks in areas covered by this populator.
      *
-     * @param chunk       the chunk to unpopulate
-     * @param replaceWith the type to replace the removed block with
+     * @param chunk           the chunk to unpopulate
+     * @param replaceWith     the type to replace the removed block with
+     * @param replaceRestWith the type to replace the rest of the blocks with
      */
-    private void unpopulate(@NotNull Chunk chunk, @NotNull Material replaceWith) {
+    private void unpopulate(@NotNull Chunk chunk, @Nullable Material replaceWith, @Nullable Material replaceRestWith) {
+        if (replaceWith == null && replaceRestWith == null) return;
+
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 for (int y = getMinGenerationHeight(); y <= getMaxGenerationHeight(); y++) {
                     Block block = chunk.getBlock(x, y, z);
-                    if (type != null && !type.equals(block.getType())) continue;
-                    if (types != null && !types.contains(block.getType())) continue;
-
-                    // If marked as having been populated by this plugin, don't remove it
-                    List<MetadataValue> metadataValues = block.getMetadata(METADATA_KEY);
-                    if (!metadataValues.isEmpty() && metadataValues.get(0).asString().equals(populatedChunksData.getId(chunk.getWorld()))) {
-                        block.removeMetadata(METADATA_KEY, plugin);
-                        continue;
-                    }
-
-                    block.setType(replaceWith, false);
+                    if (replaceWith != null) replace(block, replaceWith);
+                    if (replaceRestWith != null) replaceRest(block, replaceRestWith);
                 }
             }
         }
     }
 
+    private void replace(@NotNull Block block, @NotNull Material replaceWith) {
+        if (type != null && !type.equals(block.getType())) return;
+        if (types != null && !types.contains(block.getType())) return;
+
+        // If marked as having been populated by this plugin, don't remove it
+        List<MetadataValue> metadataValues = block.getMetadata(METADATA_KEY);
+        if (!metadataValues.isEmpty() && metadataValues.get(0).asString().equals(populatedChunksData.getId(block.getWorld()))) {
+            block.removeMetadata(METADATA_KEY, plugin);
+            return;
+        }
+
+        if (block.getType() != replaceWith) block.setType(replaceWith, false);
+    }
+
+    private void replaceRest(@NotNull Block block, @NotNull Material replaceRestWith) {
+        if (type != null && type.equals(block.getType())) return;
+        if (types != null && types.contains(block.getType())) return;
+
+        if (block.getType() != replaceRestWith) block.setType(replaceRestWith, false);
+    }
+
+    /**
+     * TODO
+     *
+     * @param random
+     * @return
+     */
     @NotNull
     private Material rollType(@NotNull Random random) {
         if (type != null) return type;

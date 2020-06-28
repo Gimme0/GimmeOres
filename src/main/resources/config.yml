@@ -15,6 +15,7 @@ debug: false
 #   min-height: <min generation height> (0)     # the min height to generate at
 #   max-height: <max generation height> (255)   # the max height to generate at
 #   replace-with: <block> (none)                # type of block to replace previous instances of the specified material with, or null for not removing
+#   replace-rest-with: <block> (none)           # type of block to replace all other blocks with, or null for not removing
 #   can-replace:                                # the type of blocks that can be replaced in the generation, or null for all
 #     - stone
 #     - andesite
@@ -84,6 +85,7 @@ default:
   min-height: 0
   max-height: 255
   replace-with: null # No replace
+  replace-rest-with: null # No replace
   can-replace:
     - stone
     - andesite

@@ -31,6 +31,7 @@ public abstract class PopulatorFactory {
      * @param minHeight           the min height to generate at
      * @param maxHeight           the max height to generate at
      * @param replaceWith         type of block to replace previous instances of the specified material with, or null for not removing
+     * @param replaceRestWith     type of block to replace all other blocks with, or null for not removing
      * @param canReplace          the type of blocks that can be replaced in the generation, or null for all
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
@@ -41,15 +42,16 @@ public abstract class PopulatorFactory {
             @NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData,
             @NotNull PopulatorType populatorType, @Nullable Material material, @Nullable Collection<Material> materials,
             int size, double triesPerChunk, int minHeight, int maxHeight, @Nullable Material replaceWith,
-            @Nullable Set<Material> canReplace, @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
+            @Nullable Material replaceRestWith, @Nullable Set<Material> canReplace, @NotNull Set<String> worlds,
+            @Nullable Set<Biome> biomes) {
         switch (populatorType) {
             default:
             case VEIN:
                 return new VeinPopulator(plugin, populatedChunksData, material, materials, size, triesPerChunk, minHeight, maxHeight,
-                        replaceWith, canReplace, worlds, biomes);
+                        replaceWith, replaceRestWith, canReplace, worlds, biomes);
             case SINGLE:
                 return new SinglePopulator(plugin, populatedChunksData, material, materials, size, triesPerChunk, minHeight, maxHeight,
-                        replaceWith, canReplace, worlds, biomes);
+                        replaceWith, replaceRestWith, canReplace, worlds, biomes);
         }
     }
 }

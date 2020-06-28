@@ -23,6 +23,7 @@ public class PopulatorSettings {
     private static final String CONFIG_MIN_HEIGHT = "min-height";
     private static final String CONFIG_MAX_HEIGHT = "max-height";
     private static final String CONFIG_REPLACE_WITH = "replace-with";
+    private static final String CONFIG_REPLACE_REST_WITH = "replace-rest-with";
     private static final String CONFIG_CAN_REPLACE = "can-replace";
     private static final String CONFIG_WORLDS = "worlds";
     private static final String CONFIG_BIOMES = "biomes";
@@ -67,6 +68,7 @@ public class PopulatorSettings {
         int minHeight = get(CONFIG_MIN_HEIGHT, 0);
         int maxHeight = get(CONFIG_MAX_HEIGHT, 255);
         @Nullable String replaceWithString = getNullable(CONFIG_REPLACE_WITH, null);
+        @Nullable String replaceRestWithString = getNullable(CONFIG_REPLACE_REST_WITH, null);
         @Nullable List<String> canReplaceStrings = getNullable(CONFIG_CAN_REPLACE, null);
         Set<String> worlds = new HashSet<>(get(CONFIG_WORLDS, Collections.singletonList("world")));
         @Nullable List<String> biomeStrings = getNullable(CONFIG_BIOMES, null);
@@ -77,6 +79,7 @@ public class PopulatorSettings {
         }
 
         Material replaceWith = replaceWithString == null ? null : Material.matchMaterial(replaceWithString);
+        Material replaceRestWith = replaceRestWithString == null ? null : Material.matchMaterial(replaceRestWithString);
 
         Set<Material> canReplace;
         if (canReplaceStrings == null) {
@@ -105,7 +108,7 @@ public class PopulatorSettings {
         }
 
         return PopulatorFactory.createPopulator(plugin, populatedChunksData,
-                populatorType, material, materials, size, tries, minHeight, maxHeight, replaceWith,
+                populatorType, material, materials, size, tries, minHeight, maxHeight, replaceWith, replaceRestWith,
                 canReplace, worlds, biomes
         );
     }
