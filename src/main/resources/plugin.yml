@@ -8,11 +8,26 @@ load: STARTUP
 
 commands:
   ores:
-    description: Count number of blocks of a specific type in surrounding chunks
-    permission: gimmeores.*
-    usage: "/ores <block> <chunk distance>"
+    description: All ores commands
+    usage: "Unknown command. Type \"/ores help\" for help."
+    permission: gimmeores.ores.*
+  # TODO: remove
+  #ores count:
+  #  description: Count number of blocks of a specific type in surrounding chunks
+  #  permission: gimmeores.*
+  #  usage: "/ores <block> <chunk distance>"
+  #ores load:
+  #  description: Count number of blocks of a specific type in surrounding chunks
+  #  permission: gimmeores.*
+  #  usage: "/ores <block> <chunk distance>"
 
 permissions:
   gimmeores.*:
-    description: Allows ores command
+    description: Wildcard permission
+    default: op
+    children:
+      gimmeores.ores.*: true
+
+  gimmeores.ores.*:
+    description: Can use ores commands
     default: op
