@@ -21,6 +21,7 @@ public class VeinPopulator extends Populator {
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
      * @param type                the material of the blocks to generate, or null for all (only for removing)
+     * @param types               the materials of the blocks to generate, or null
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -31,9 +32,10 @@ public class VeinPopulator extends Populator {
      * @param biomes              the biomes to generate in, or null for all biomes
      */
     public VeinPopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
-                         int size, double triesPerChunk, int minHeight, int maxHeight, @Nullable Material replaceWith,
-                         @Nullable Set<Material> canReplace, @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
-        super(plugin, populatedChunksData, type, size, triesPerChunk, minHeight, maxHeight, replaceWith, canReplace, worlds, biomes);
+                         @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
+                         @Nullable Material replaceWith, @Nullable Set<Material> canReplace,
+                         @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
+        super(plugin, populatedChunksData, type, types, size, triesPerChunk, minHeight, maxHeight, replaceWith, canReplace, worlds, biomes);
     }
 
     /**
@@ -91,7 +93,7 @@ public class VeinPopulator extends Populator {
                                 double zThresh = (iz + 0.5d - zPos) / (fuzzXZ / 2.0d);
                                 if (xThresh * xThresh + yThresh * yThresh + zThresh * zThresh < 1.0d) {
 
-                                    setBlock(world, sourceChunk, ix, iy, iz);
+                                    setBlock(world, sourceChunk, random, ix, iy, iz);
 
                                 }
                             }

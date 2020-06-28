@@ -10,6 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Random;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class SinglePopulator extends Populator {
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
      * @param type                the material of the blocks to generate, or null for all (only for removing)
+     * @param types               the materials of the blocks to generate, or null
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -31,13 +33,14 @@ public class SinglePopulator extends Populator {
      * @param biomes              the biomes to generate in, or null for all biomes
      */
     public SinglePopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
-                           int size, double triesPerChunk, int minHeight, int maxHeight, @Nullable Material replaceWith,
-                           @Nullable Set<Material> canReplace, @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
-        super(plugin, populatedChunksData, type, size, triesPerChunk, minHeight, maxHeight, replaceWith, canReplace, worlds, biomes);
+                           @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
+                           @Nullable Material replaceWith, @Nullable Set<Material> canReplace,
+                           @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
+        super(plugin, populatedChunksData, type, types, size, triesPerChunk, minHeight, maxHeight, replaceWith, canReplace, worlds, biomes);
     }
 
     @Override
     protected void generate(@NotNull World world, @NotNull Chunk sourceChunk, @NotNull Random random, int size, int x, int y, int z) {
-        setBlock(world, sourceChunk, x, y, z);
+        setBlock(world, sourceChunk, random, x, y, z);
     }
 }

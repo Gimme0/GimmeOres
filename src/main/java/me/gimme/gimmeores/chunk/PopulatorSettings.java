@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Used for creating Populator objects from the config settings.
@@ -33,7 +34,7 @@ public class PopulatorSettings {
     private PopulatedChunksData populatedChunksData;
 
     public PopulatorSettings(@NotNull Map<String, ?> populatorSettings, @Nullable ConfigurationSection defaultSettings,
-                              @NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData) {
+                             @NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData) {
         this.populatorSettings = populatorSettings;
         this.defaultSettings = defaultSettings;
         this.plugin = plugin;
@@ -45,7 +46,21 @@ public class PopulatorSettings {
      */
     @Nullable
     public Populator createPopulator() {
-        Material material = Material.matchMaterial(get(CONFIG_MATERIAL, ""));
+        List<Material> materials;
+        Material material;
+        if (isAssignableFrom(List.class, CONFIG_MATERIAL)) {
+            material = null;
+            List<String> materialStrings = getNullable(CONFIG_MATERIAL, null);
+            materials = materialStrings != null
+                    ? materialStrings.stream()
+                    .map(Material::matchMaterial)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())
+                    : null;
+        } else {
+            material = Material.matchMaterial(get(CONFIG_MATERIAL, ""));
+            materials = null;
+        }
         String type = get(CONFIG_TYPE, "VEIN");
         int size = get(CONFIG_SIZE, 1);
         double tries = getDouble(CONFIG_TRIES, 0d);
@@ -90,16 +105,16 @@ public class PopulatorSettings {
         }
 
         return PopulatorFactory.createPopulator(plugin, populatedChunksData,
-                populatorType, material, size, tries, minHeight, maxHeight, replaceWith,
+                populatorType, material, materials, size, tries, minHeight, maxHeight, replaceWith,
                 canReplace, worlds, biomes
         );
     }
 
     /**
+     * @param path the path to get the value from in the populator settings
+     * @param def  the last resort default value
      * @return the double value from the settings at the specified path, or the default value from the config,
      * or the specified default value
-     * @param path the path to get the value from in the populator settings
-     * @param def the last resort default value
      */
     private double getDouble(@NotNull String path, double def) {
         Number value = (Number) populatorSettings.get(path);
@@ -109,11 +124,11 @@ public class PopulatorSettings {
     }
 
     /**
+     * @param path the path to get the value from in the populator settings
+     * @param def  the last resort default value
+     * @param <T>  the type of the setting value
      * @return the value from the settings at the specified path, or the default value from the config,
      * or the specified default value
-     * @param path the path to get the value from in the populator settings
-     * @param def the last resort default value
-     * @param <T> the type of the setting value
      */
     @SuppressWarnings("unchecked")
     @NotNull
@@ -126,11 +141,11 @@ public class PopulatorSettings {
     }
 
     /**
+     * @param path the path to get the value from in the populator settings
+     * @param def  the last resort default value
+     * @param <T>  the type of the setting value
      * @return the nullable value from the settings at the specified path, or the default value from the config,
      * or the specified default value
-     * @param path the path to get the value from in the populator settings
-     * @param def the last resort default value
-     * @param <T> the type of the setting value
      */
     @SuppressWarnings("unchecked")
     @Nullable
@@ -138,5 +153,23 @@ public class PopulatorSettings {
         if (populatorSettings.containsKey(path)) return (T) populatorSettings.get(path);
         if (defaultSettings != null && defaultSettings.contains(path)) return (T) defaultSettings.get(path);
         return def;
+    }
+
+    /**
+     * Determines if the class or interface represented by the specified {@code Class} parameter is either the same as,
+     * or is a superclass or superinterface of, the value from the settings at the specified path, or the default value
+     * from the config.
+     *
+     * @param cls  the {@code Class} object to be checked against
+     * @param path the path to get the value from in the populator settings
+     * @return if objects of the type of the value at the specified settings path can be assigned to objects of the
+     * specified class type
+     */
+    private boolean isAssignableFrom(@NotNull Class<?> cls, @NotNull String path) {
+        Object value = populatorSettings.get(path);
+        if (value == null && defaultSettings != null && defaultSettings.contains(path))
+            value = defaultSettings.get(path);
+        if (value == null) return false;
+        return cls.isAssignableFrom(value.getClass());
     }
 }

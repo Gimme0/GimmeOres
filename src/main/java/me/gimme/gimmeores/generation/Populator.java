@@ -1,6 +1,7 @@
 package me.gimme.gimmeores.generation;
 
 import me.gimme.gimmeores.chunk.PopulatedChunksData;
+import me.gimme.gimmeores.utils.RandomizerHashSet;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -30,6 +31,8 @@ public abstract class Populator {
 
     @Nullable
     private Material type;
+    @Nullable
+    private RandomizerHashSet<Material> types;
     private int size;
     private int minHeight;
     private int maxHeight;
@@ -47,6 +50,7 @@ public abstract class Populator {
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
      * @param type                the material of the blocks to generate, or null for all (only for removing)
+     * @param types               the materials of the blocks to generate, or null
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -56,14 +60,15 @@ public abstract class Populator {
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
      */
-    public Populator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @NotNull Material type,
-                     int size, double triesPerChunk, int minHeight, int maxHeight,
+    public Populator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
+                     @Nullable Collection<Material> types, int size, double triesPerChunk, int minHeight, int maxHeight,
                      @Nullable Material replaceWith, @Nullable Set<Material> canReplace,
                      @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         this.plugin = plugin;
         this.populatedChunksData = populatedChunksData;
 
         this.type = type;
+        this.types = types != null ? new RandomizerHashSet<>(types) : null;
         this.size = size;
         this.triesPerChunk = triesPerChunk;
         this.minHeight = minHeight;
@@ -105,7 +110,7 @@ public abstract class Populator {
         }
 
         if (replaceWith != null) unpopulate(source, replaceWith);
-        if (type == null || size == 0 || triesPerChunk == 0) return;
+        if ((type == null && types == null) || size == 0 || triesPerChunk == 0) return;
 
         int offset = 8;
 
@@ -148,7 +153,7 @@ public abstract class Populator {
      * @param y           the Y-coordinate of the block
      * @param z           the Z-coordinate of the block
      */
-    protected void setBlock(@NotNull World world, @NotNull Chunk sourceChunk, int x, int y, int z) {
+    protected void setBlock(@NotNull World world, @NotNull Chunk sourceChunk, @NotNull Random random, int x, int y, int z) {
         // Check y-bounds of chunk
         if (y < 0 || 255 < y) return;
         // Check if x and z are within the 2x2 chunks with the center offset by 8 from the source chunk's center
@@ -160,7 +165,7 @@ public abstract class Populator {
         Block block = getBlock(world, x, y, z);
         if (canReplace != null && !canReplace.contains(block.getType())) return;
 
-        block.setType(Objects.requireNonNull(type), false);
+        block.setType(rollType(random), false);
 
         // If the block is in a chunk that hasn't been populated yet, mark it so that it doesn't get removed by
         // unpopulation later.
@@ -182,7 +187,8 @@ public abstract class Populator {
             for (int z = 0; z < 16; z++) {
                 for (int y = getMinGenerationHeight(); y <= getMaxGenerationHeight(); y++) {
                     Block block = chunk.getBlock(x, y, z);
-                    if (type != null && !block.getType().equals(type)) continue;
+                    if (type != null && !type.equals(block.getType())) continue;
+                    if (types != null && !types.contains(block.getType())) continue;
 
                     // If marked as having been populated by this plugin, don't remove it
                     List<MetadataValue> metadataValues = block.getMetadata(METADATA_KEY);
@@ -195,6 +201,13 @@ public abstract class Populator {
                 }
             }
         }
+    }
+
+    @NotNull
+    private Material rollType(@NotNull Random random) {
+        if (type != null) return type;
+        if (types != null) return types.getRandomElement(random);
+        throw new IllegalStateException("Either type of types needs to be non null when calling this method");
     }
 
     /**

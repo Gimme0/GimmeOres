@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Set;
 
 public abstract class PopulatorFactory {
@@ -24,6 +25,7 @@ public abstract class PopulatorFactory {
      * @param populatedChunksData the data of populated chunks
      * @param populatorType       the populator type to create
      * @param material            the material of the blocks to generate, or null for all (only for removing)
+     * @param materials           the materials of the blocks to generate, or null
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -37,16 +39,16 @@ public abstract class PopulatorFactory {
     @NotNull
     public static Populator createPopulator(
             @NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData,
-            @NotNull PopulatorType populatorType, @Nullable Material material,
+            @NotNull PopulatorType populatorType, @Nullable Material material, @Nullable Collection<Material> materials,
             int size, double triesPerChunk, int minHeight, int maxHeight, @Nullable Material replaceWith,
             @Nullable Set<Material> canReplace, @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         switch (populatorType) {
             default:
             case VEIN:
-                return new VeinPopulator(plugin, populatedChunksData, material, size, triesPerChunk, minHeight, maxHeight,
+                return new VeinPopulator(plugin, populatedChunksData, material, materials, size, triesPerChunk, minHeight, maxHeight,
                         replaceWith, canReplace, worlds, biomes);
             case SINGLE:
-                return new SinglePopulator(plugin, populatedChunksData, material, size, triesPerChunk, minHeight, maxHeight,
+                return new SinglePopulator(plugin, populatedChunksData, material, materials, size, triesPerChunk, minHeight, maxHeight,
                         replaceWith, canReplace, worlds, biomes);
         }
     }
