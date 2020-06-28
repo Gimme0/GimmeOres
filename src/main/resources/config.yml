@@ -8,15 +8,15 @@ debug: false
 # slightly (e.g. "tries" for emerald).
 #
 # POPULATOR FORMAT:
-# - material: <block>                           # the material of the blocks to generate, or null for all (only for removing)
+# - material: <block>                           # the material of the blocks to generate, or "all" for all blocks (only for replacing)
 #   type: [VEIN|SINGLE] (VEIN)                  # the populator type: VEIN for clusters, SINGLE for solo blocks
-#   size: <vein size> (1)                       # the size of the veins to generate (not exact)
+#   size: <vein size> (1)                       # the size of the veins to generate (not exact for veins)
 #   tries: <generation tries per chunk> (0.0)   # number of generation attempts per chunk
 #   min-height: <min generation height> (0)     # the min height to generate at
 #   max-height: <max generation height> (255)   # the max height to generate at
-#   replace-with: <block> (none)                # type of block to replace previous instances of the specified material with, or null for not removing
-#   replace-rest-with: <block> (none)           # type of block to replace all other blocks with, or null for not removing
-#   can-replace:                                # the type of blocks that can be replaced in the generation, or null for all
+#   replace-with: <block> (none)                # type of block to replace previous instances of the specified material with, or "none" for not removing
+#   replace-rest-with: <block> (none)           # type of block to replace all other blocks with, or "none" for not removing
+#   can-replace:                                # the type of blocks that can be replaced in the generation, or "all" for all
 #     - stone
 #     - andesite
 #     - diorite
@@ -26,7 +26,7 @@ debug: false
 #     - polished_granite
 #   worlds:                                     # the worlds to generate in
 #     - world
-#   biomes: (all)                               # the biomes to generate in, or null for all
+#   biomes: (all)                               # the biomes to generate in, or "all" for all
 #     - <BIOME>
 #
 populators:
@@ -57,14 +57,14 @@ populators:
 
 # Default values used when absent from a populator above
 default:
-  material: null
+  material: all
   type: VEIN
   size: 1
   tries: 0.0
   min-height: 0
   max-height: 255
-  replace-with: null # No replace
-  replace-rest-with: null # No replace
+  replace-with: none
+  replace-rest-with: none
   can-replace:
     - stone
     - andesite
@@ -75,5 +75,5 @@ default:
     - polished_granite
   worlds:
     - world
-  biomes: null # All
+  biomes: all
 

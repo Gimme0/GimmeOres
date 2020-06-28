@@ -27,6 +27,8 @@ public class PopulatorSettings {
     private static final String CONFIG_WORLDS = "worlds";
     private static final String CONFIG_BIOMES = "biomes";
 
+    private static final List<String> NULL_EQUIVALENT_STRINGS = Arrays.asList("all", "none");
+
     private Map<String, ?> populatorSettings;
     @Nullable
     private ConfigurationSection defaultSettings;
@@ -77,16 +79,12 @@ public class PopulatorSettings {
         Material replaceWith = replaceWithString == null ? null : Material.matchMaterial(replaceWithString);
         Material replaceRestWith = replaceRestWithString == null ? null : Material.matchMaterial(replaceRestWithString);
 
-        Set<Material> canReplace;
-        if (canReplaceStrings == null) {
-            canReplace = null;
-        } else {
-            canReplace = new HashSet<>();
-            for (String canReplaceString : canReplaceStrings) {
-                Material mat = Material.matchMaterial(canReplaceString);
-                if (mat != null) canReplace.add(mat);
-            }
-        }
+        Set<Material> canReplace = canReplaceStrings != null
+                ? canReplaceStrings.stream()
+                .map(Material::matchMaterial)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet())
+                : null;
 
         Set<Biome> biomes;
         if (biomeStrings == null) {
@@ -95,7 +93,7 @@ public class PopulatorSettings {
             biomes = new HashSet<>();
             for (String biomeString : biomeStrings) {
                 for (Biome bio : Biome.values()) {
-                    if (bio.toString().equals(biomeString)) {
+                    if (bio.toString().equalsIgnoreCase(biomeString)) {
                         biomes.add(bio);
                         break;
                     }
@@ -150,7 +148,12 @@ public class PopulatorSettings {
     @Nullable
     private <T> T getNullable(@NotNull String path, @Nullable T def) {
         if (populatorSettings.containsKey(path)) return (T) populatorSettings.get(path);
-        if (defaultSettings != null && defaultSettings.contains(path)) return (T) defaultSettings.get(path);
+        if (defaultSettings != null && defaultSettings.contains(path)) {
+            if (defaultSettings.isString(path) && NULL_EQUIVALENT_STRINGS.stream().anyMatch(s -> s.equalsIgnoreCase(defaultSettings.getString(path)))) {
+                return null;
+            }
+            return (T) defaultSettings.get(path);
+        }
         return def;
     }
 
