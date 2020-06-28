@@ -108,6 +108,6 @@ public class VeinPopulator extends Populator {
 
     @Override
     protected int getMinGenerationHeight(int size, int minHeight) {
-        return minHeight - (size > 0 ? 3 : 0);
+        return minHeight - (size > 3 ? 3 : 0);
     }
 }
