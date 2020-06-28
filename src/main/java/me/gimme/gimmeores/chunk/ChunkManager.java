@@ -63,10 +63,10 @@ public class ChunkManager implements Listener {
     }
 
     /**
-     * @return the number of generated chunks in the specified world
-     * @param world
+     * @return the number of populated chunks in the specified world
+     * @param world the world to get the number of populated chunks in
      */
-    public int getNumberOfGeneratedChunks(@NotNull World world) {
+    public int getNumberOfPopulatedChunks(@NotNull World world) {
         return populatedChunksData.getPopulatedChunks(world).size();
     }
 

@@ -11,15 +11,6 @@ commands:
     description: All ores commands
     usage: "Unknown command. Type \"/ores help\" for help."
     permission: gimmeores.ores.*
-  # TODO: remove
-  #ores count:
-  #  description: Count number of blocks of a specific type in surrounding chunks
-  #  permission: gimmeores.*
-  #  usage: "/ores <block> <chunk distance>"
-  #ores load:
-  #  description: Count number of blocks of a specific type in surrounding chunks
-  #  permission: gimmeores.*
-  #  usage: "/ores <block> <chunk distance>"
 
 permissions:
   gimmeores.*:

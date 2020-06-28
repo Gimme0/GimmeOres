@@ -3,6 +3,7 @@ package me.gimme.gimmeores.command.commands;
 import me.gimme.gimmeores.command.BaseCommand;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class OresCountCommand extends BaseCommand {
     public OresCountCommand() {
@@ -40,38 +42,33 @@ public class OresCountCommand extends BaseCommand {
 
         Chunk playerChunk = player.getLocation().getChunk();
 
-        int chunkCount = 0;
-        int blockCount = 0;
-        int[] heightCount = new int[256];
+        final AtomicInteger chunkCount = new AtomicInteger(0);
+        final AtomicInteger blockCount = new AtomicInteger(0);
+        final int[] heightCount = new int[256];
 
-        for (int cx = -chunkDistance; cx <= chunkDistance; cx++) {
-            for (int cz = -chunkDistance; cz <= chunkDistance; cz++) {
-                if (!player.getWorld().isChunkLoaded(playerChunk.getX() + cx, playerChunk.getZ() + cz)) {
-                    player.getWorld().loadChunk(playerChunk.getX() + cx, playerChunk.getZ() + cz);
-                }
-            }
-        }
+        forEachChunk(player.getWorld(), playerChunk.getX(), playerChunk.getZ(), chunkDistance, World::loadChunk);
 
-        for (int cx = -chunkDistance; cx <= chunkDistance; cx++) {
-            for (int cz = -chunkDistance; cz <= chunkDistance; cz++) {
-                Chunk chunk = player.getWorld().getChunkAt(playerChunk.getX() + cx, playerChunk.getZ() + cz);
-                chunkCount++;
+        forEachChunk(player.getWorld(), playerChunk.getX(), playerChunk.getZ(), chunkDistance, (World world, Chunk chunk) -> {
+            chunkCount.incrementAndGet();
 
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int y = 0; y < 256; y++) {
-                            Block block = chunk.getBlock(x, y, z);
-                            if (!block.getType().equals(material)) continue;
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int y = 0; y < 256; y++) {
+                        Block block = chunk.getBlock(x, y, z);
+                        if (!block.getType().equals(material)) continue;
 
-                            blockCount++;
-                            heightCount[y] = heightCount[y] + 1;
-                        }
+                        blockCount.incrementAndGet();
+                        heightCount[y] = heightCount[y] + 1;
                     }
                 }
             }
-        }
+        });
 
-        return getFormattedMessage(player, material, chunkDistance, blockCount, chunkCount, heightCount);
+        forEachChunk(player.getWorld(), playerChunk.getX(), playerChunk.getZ(), chunkDistance, (World world, Chunk chunk) -> {
+            world.setChunkForceLoaded(chunk.getX(), chunk.getZ(), false);
+        });
+
+        return getFormattedMessage(player, material, chunkDistance, blockCount.get(), chunkCount.get(), heightCount);
     }
 
     @NotNull
@@ -94,5 +91,17 @@ public class OresCountCommand extends BaseCommand {
         }
 
         return sb.toString();
+    }
+
+    private void forEachChunk(@NotNull World world, int sourceX, int sourceZ, int chunkDistance, @NotNull ForChunk forChunk) {
+        for (int x = -chunkDistance; x <= chunkDistance; x++) {
+            for (int z = -chunkDistance; z <= chunkDistance; z++) {
+                forChunk.apply(world, world.getChunkAt(sourceX + x, sourceZ + z));
+            }
+        }
+    }
+
+    private interface ForChunk {
+        void apply(@NotNull World world, @NotNull Chunk chunk);
     }
 }

@@ -2,16 +2,14 @@ package me.gimme.gimmeores;
 
 import me.gimme.gimmecore.command.BaseCommand;
 import me.gimme.gimmeores.chunk.ChunkManager;
-import me.gimme.gimmeores.command.CommandManager;
 import me.gimme.gimmeores.command.commands.OresCountCommand;
+import me.gimme.gimmeores.command.commands.OresPopulateCommand;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public final class GimmeOres extends JavaPlugin implements CommandExecutor {
     public static final String PERMISSIONS_PATH = "gimmeores";
@@ -25,11 +23,11 @@ public final class GimmeOres extends JavaPlugin implements CommandExecutor {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
-        CommandManager commandManager = new CommandManager();
-        CommandManager.COMMANDS.stream()
-                .map(this::getCommand)
-                .filter(Objects::nonNull)
-                .forEach(command -> command.setExecutor(commandManager));
+        //CommandManager commandManager = new CommandManager(); // TODO: remove
+        //CommandManager.COMMANDS.stream()
+        //        .map(this::getCommand)
+        //        .filter(Objects::nonNull)
+        //        .forEach(command -> command.setExecutor(commandManager));
 
         registerEvents(chunkManager);
 
@@ -46,6 +44,7 @@ public final class GimmeOres extends JavaPlugin implements CommandExecutor {
                 Arrays.asList(Material.values()), (material) -> material.toString().toLowerCase());
 
         registerCommand(new OresCountCommand());
+        registerCommand(new OresPopulateCommand(chunkManager));
     }
 
     private void registerCommand(BaseCommand command) {
