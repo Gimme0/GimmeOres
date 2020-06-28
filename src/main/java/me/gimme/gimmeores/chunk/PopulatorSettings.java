@@ -46,7 +46,6 @@ public class PopulatorSettings {
     @Nullable
     public Populator createPopulator() {
         Material material = Material.matchMaterial(get(CONFIG_MATERIAL, ""));
-        if (material == null) return null;
         String type = get(CONFIG_TYPE, "VEIN");
         int size = get(CONFIG_SIZE, 1);
         double tries = getDouble(CONFIG_TRIES, 0d);

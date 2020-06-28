@@ -28,7 +28,7 @@ public abstract class Populator {
     @NotNull
     private PopulatedChunksData populatedChunksData;
 
-    @NotNull
+    @Nullable
     private Material type;
     private int size;
     private int minHeight;
@@ -46,7 +46,7 @@ public abstract class Populator {
     /**
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
-     * @param type                the material of the blocks to generate
+     * @param type                the material of the blocks to generate, or null for all (only for removing)
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -105,7 +105,7 @@ public abstract class Populator {
         }
 
         if (replaceWith != null) unpopulate(source, replaceWith);
-        if (size == 0 || triesPerChunk == 0) return;
+        if (type == null || size == 0 || triesPerChunk == 0) return;
 
         int offset = 8;
 
@@ -160,7 +160,7 @@ public abstract class Populator {
         Block block = getBlock(world, x, y, z);
         if (canReplace != null && !canReplace.contains(block.getType())) return;
 
-        block.setType(type, false);
+        block.setType(Objects.requireNonNull(type), false);
 
         // If the block is in a chunk that hasn't been populated yet, mark it so that it doesn't get removed by
         // unpopulation later.
@@ -182,7 +182,7 @@ public abstract class Populator {
             for (int z = 0; z < 16; z++) {
                 for (int y = getMinGenerationHeight(); y <= getMaxGenerationHeight(); y++) {
                     Block block = chunk.getBlock(x, y, z);
-                    if (!block.getType().equals(type)) continue;
+                    if (type != null && !block.getType().equals(type)) continue;
 
                     // If marked as having been populated by this plugin, don't remove it
                     List<MetadataValue> metadataValues = block.getMetadata(METADATA_KEY);

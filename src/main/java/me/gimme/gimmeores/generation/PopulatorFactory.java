@@ -23,7 +23,7 @@ public abstract class PopulatorFactory {
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
      * @param populatorType       the populator type to create
-     * @param material            the material of the blocks to generate
+     * @param material            the material of the blocks to generate, or null for all (only for removing)
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -37,7 +37,7 @@ public abstract class PopulatorFactory {
     @NotNull
     public static Populator createPopulator(
             @NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData,
-            @NotNull PopulatorType populatorType, @NotNull Material material,
+            @NotNull PopulatorType populatorType, @Nullable Material material,
             int size, double triesPerChunk, int minHeight, int maxHeight, @Nullable Material replaceWith,
             @Nullable Set<Material> canReplace, @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         switch (populatorType) {

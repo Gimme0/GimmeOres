@@ -20,7 +20,7 @@ public class SinglePopulator extends Populator {
     /**
      * @param plugin              the plugin
      * @param populatedChunksData the data of populated chunks
-     * @param type                the material of the blocks to generate
+     * @param type                the material of the blocks to generate, or null for all (only for removing)
      * @param size                the size of the generation
      * @param triesPerChunk       number of generation attempts per chunk
      * @param minHeight           the min height to generate at
@@ -30,7 +30,7 @@ public class SinglePopulator extends Populator {
      * @param worlds              the worlds to generate in
      * @param biomes              the biomes to generate in, or null for all biomes
      */
-    public SinglePopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @NotNull Material type,
+    public SinglePopulator(@NotNull Plugin plugin, @NotNull PopulatedChunksData populatedChunksData, @Nullable Material type,
                            int size, double triesPerChunk, int minHeight, int maxHeight, @Nullable Material replaceWith,
                            @Nullable Set<Material> canReplace, @NotNull Set<String> worlds, @Nullable Set<Biome> biomes) {
         super(plugin, populatedChunksData, type, size, triesPerChunk, minHeight, maxHeight, replaceWith, canReplace, worlds, biomes);
