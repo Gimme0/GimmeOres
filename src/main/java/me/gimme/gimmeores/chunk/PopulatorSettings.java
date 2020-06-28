@@ -47,19 +47,18 @@ public class PopulatorSettings {
      */
     @Nullable
     public Populator createPopulator() {
-        List<Material> materials;
+        List<String> materialStrings;
         if (isAssignableFrom(List.class, CONFIG_MATERIAL)) {
-            List<String> materialStrings = getNullable(CONFIG_MATERIAL, null);
-            materials = materialStrings != null
-                    ? materialStrings.stream()
-                    .map(Material::matchMaterial)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())
-                    : null;
+            materialStrings = getNullable(CONFIG_MATERIAL, null);
         } else {
-            Material material = Material.matchMaterial(get(CONFIG_MATERIAL, ""));
-            materials = material != null ? new ArrayList<>(Collections.singletonList(material)) : null;
+            materialStrings = new ArrayList<>(Collections.singletonList(get(CONFIG_MATERIAL, "")));
         }
+        List<Material> materials = materialStrings != null
+                ? materialStrings.stream()
+                .map(Material::matchMaterial)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                : null;
         String type = get(CONFIG_TYPE, "VEIN");
         int size = get(CONFIG_SIZE, 1);
         double tries = getDouble(CONFIG_TRIES, 0d);

@@ -30,27 +30,6 @@ debug: false
 #     - <BIOME>
 #
 populators:
-  - material: gold_ore
-    max-height: 31
-    replace-with: stone
-  - material: gold_ore
-    size: 9
-    tries: 20
-    min-height: 32
-    max-height: 79
-    replace-with: stone
-    biomes:
-      - BADLANDS
-      - BADLANDS_PLATEAU
-      - ERODED_BADLANDS
-      - MODIFIED_BADLANDS_PLATEAU
-      - MODIFIED_WOODED_BADLANDS_PLATEAU
-      - WOODED_BADLANDS_PLATEAU
-  - material: gold_ore
-    size: 9
-    tries: 2
-    max-height: 31
-
   - material: emerald_ore
     type: SINGLE
     tries: 4
