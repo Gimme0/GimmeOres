@@ -37,9 +37,6 @@ public class OresPopulateCommand extends BaseCommand {
             return errorMessageWithUsage(CommandError.NOT_A_NUMBER, args[0]);
         }
 
-        sender.sendMessage("Populating chunks...");
-
-        int numberOfPreviouslyPopulatedChunks = chunkManager.getNumberOfPopulatedChunks(player.getWorld());
         Chunk playerChunk = player.getLocation().getChunk();
 
         // Load all chunks
@@ -49,9 +46,10 @@ public class OresPopulateCommand extends BaseCommand {
             world.setChunkForceLoaded(chunk.getX(), chunk.getZ(), false);
         });
 
-        int chunksPopulated = chunkManager.getNumberOfPopulatedChunks(player.getWorld()) - numberOfPreviouslyPopulatedChunks;
+        int chunksSide = 1 + chunkDistance * 2;
+        double chunksPopulated = chunksSide * chunksSide;
 
-        return "Populated " + chunksPopulated + " chunks";
+        return "Populating " + chunksPopulated + " chunks";
     }
 
     private void forEachChunk(@NotNull World world, int sourceX, int sourceZ, int chunkDistance, @NotNull ForChunk forChunk) {

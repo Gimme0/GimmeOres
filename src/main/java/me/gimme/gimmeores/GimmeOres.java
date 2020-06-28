@@ -1,7 +1,9 @@
 package me.gimme.gimmeores;
 
-import me.gimme.gimmecore.command.BaseCommand;
+import me.gimme.gimmecore.command.BaseHelpCommand;
+import me.gimme.gimmecore.command.CommandManager;
 import me.gimme.gimmeores.chunk.ChunkManager;
+import me.gimme.gimmeores.command.BaseCommand;
 import me.gimme.gimmeores.command.commands.OresCountCommand;
 import me.gimme.gimmeores.command.commands.OresPopulateCommand;
 import org.bukkit.Material;
@@ -15,7 +17,7 @@ public final class GimmeOres extends JavaPlugin implements CommandExecutor {
     public static final String PERMISSIONS_PATH = "gimmeores";
     public static final String ORES_COMMAND = "ores";
 
-    private me.gimme.gimmecore.command.CommandManager commandManager = new me.gimme.gimmecore.command.CommandManager(this);
+    private CommandManager commandManager = new CommandManager(this);
     private ChunkManager chunkManager = new ChunkManager(this);
 
     @Override
@@ -23,13 +25,8 @@ public final class GimmeOres extends JavaPlugin implements CommandExecutor {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
-        //CommandManager commandManager = new CommandManager(); // TODO: remove
-        //CommandManager.COMMANDS.stream()
-        //        .map(this::getCommand)
-        //        .filter(Objects::nonNull)
-        //        .forEach(command -> command.setExecutor(commandManager));
-
-        registerEvents(chunkManager);
+        registerCommands();
+        registerEvents();
 
         chunkManager.onEnable();
     }
@@ -40,14 +37,19 @@ public final class GimmeOres extends JavaPlugin implements CommandExecutor {
     }
 
     private void registerCommands() {
-        commandManager.registerPlaceholder(me.gimme.gimmeores.command.BaseCommand.MATERIAL_PLACEHOLDER,
+        commandManager.registerPlaceholder(BaseCommand.MATERIAL_PLACEHOLDER,
                 Arrays.asList(Material.values()), (material) -> material.toString().toLowerCase());
 
+        registerCommand(new BaseHelpCommand(commandManager, ORES_COMMAND, null, false) {});
         registerCommand(new OresCountCommand());
         registerCommand(new OresPopulateCommand(chunkManager));
     }
 
-    private void registerCommand(BaseCommand command) {
+    private void registerEvents() {
+        registerEvents(chunkManager);
+    }
+
+    private void registerCommand(me.gimme.gimmecore.command.BaseCommand command) {
         commandManager.register(command);
     }
 

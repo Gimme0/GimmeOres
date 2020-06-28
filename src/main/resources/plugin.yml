@@ -21,4 +21,3 @@ permissions:
 
   gimmeores.ores.*:
     description: Can use ores commands
-    default: op
