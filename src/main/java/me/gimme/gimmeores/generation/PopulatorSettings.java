@@ -1,6 +1,7 @@
 package me.gimme.gimmeores.generation;
 
 import me.gimme.gimmeores.chunk.PopulatedChunksData;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,7 +53,10 @@ public class PopulatorSettings {
         if (isAssignableFrom(List.class, CONFIG_MATERIAL)) {
             materialStrings = getNullable(CONFIG_MATERIAL, null);
         } else {
-            materialStrings = new ArrayList<>(Collections.singletonList(get(CONFIG_MATERIAL, "")));
+            String materialString = getNullable(CONFIG_MATERIAL, null);
+            materialStrings = materialString != null
+                    ? new ArrayList<>(Collections.singletonList(materialString))
+                    : null;
         }
         List<Material> materials = materialStrings != null
                 ? materialStrings.stream()
@@ -147,14 +151,22 @@ public class PopulatorSettings {
     @SuppressWarnings("unchecked")
     @Nullable
     private <T> T getNullable(@NotNull String path, @Nullable T def) {
-        if (populatorSettings.containsKey(path)) return (T) populatorSettings.get(path);
-        if (defaultSettings != null && defaultSettings.contains(path)) {
-            if (defaultSettings.isString(path) && NULL_EQUIVALENT_STRINGS.stream().anyMatch(s -> s.equalsIgnoreCase(defaultSettings.getString(path)))) {
-                return null;
-            }
-            return (T) defaultSettings.get(path);
+        Object value;
+        if (populatorSettings.containsKey(path)) {
+            value = populatorSettings.get(path);
+        } else if (defaultSettings != null && defaultSettings.contains(path)) {
+            value = defaultSettings.get(path);
+        } else {
+            return def;
         }
-        return def;
+
+        if (value == null) return null;
+
+        if (String.class.isAssignableFrom(value.getClass()) && NULL_EQUIVALENT_STRINGS.stream().anyMatch(s -> s.equalsIgnoreCase((String) value))) {
+            return null;
+        }
+
+        return (T) value;
     }
 
     /**
@@ -171,7 +183,7 @@ public class PopulatorSettings {
         Object value = populatorSettings.get(path);
         if (value == null && defaultSettings != null && defaultSettings.contains(path))
             value = defaultSettings.get(path);
-        if (value == null) return false;
+        if (value == null) return true;
         return cls.isAssignableFrom(value.getClass());
     }
 }
