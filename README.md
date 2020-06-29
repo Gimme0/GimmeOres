@@ -1,2 +1,2 @@
 # GimmeOres
-Ore distribution
+Ore distribution control
