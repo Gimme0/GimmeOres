@@ -42,7 +42,7 @@ public final class GimmeOres extends JavaPlugin implements CommandExecutor {
         commandManager.registerPlaceholder(BaseCommand.MATERIAL_PLACEHOLDER,
                 Arrays.asList(Material.values()), (material) -> material.toString().toLowerCase());
 
-        registerCommand(new BaseHelpCommand(commandManager, ORES_COMMAND, null, false) {});
+        commandManager.registerBasicHelpCommand(ORES_COMMAND);
         registerCommand(new OresCountCommand());
         registerCommand(new OresPopulateCommand(chunkManager));
     }
